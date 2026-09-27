@@ -132,7 +132,7 @@ function Ajustes() {
         <Row label="Última sincronización">{st.data?.lastRun?.finished_at ? fmtDateTime(st.data.lastRun.finished_at, p.timezone) : "—"}</Row>
         <Row label="Próxima sincronización">{p.hydrated ? fmtDateTime(nextCronRun().toISOString(), p.timezone) : "—"}</Row>
         {st.data?.sources.map((s) => {
-          const x = SOURCE_STATUS[s.status] ?? SOURCE_STATUS.inactive;
+          const x = SOURCE_STATUS[s.status] ?? { l: "Desactivada", c: "bg-muted-foreground" };
           return (
             <Row key={s.id} label={s.name}>
               <span className="inline-flex items-center gap-1.5 text-[13px]"><span className={cn("h-1.5 w-1.5 rounded-full", x.c)} />{x.l}</span>
