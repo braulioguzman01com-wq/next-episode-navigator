@@ -78,7 +78,7 @@ export async function runSync(db: DB, trigger: "cron" | "manual", onlySourceId?:
 
     await stage("Analizando títulos");
     // Highest trust first so lower-trust data only fills gaps.
-    collected.sort((a, b) => TRUST_RANK[b.src.trust] - TRUST_RANK[a.src.trust] || a.src.priority - b.src.priority);
+    collected.sort((a, b) => (TRUST_RANK[b.src.trust] ?? 1) - (TRUST_RANK[a.src.trust] ?? 1) || a.src.priority - b.src.priority);
     const videoByName = new Map(videoSources!.map((v) => [v.name.toLowerCase(), v]));
 
     await stage("Comparando datos");
@@ -115,7 +115,7 @@ export async function runSync(db: DB, trigger: "cron" | "manual", onlySourceId?:
         } else {
           row = { ...row };
           const primaryTrust = TRUST_RANK[sources!.find((s) => s.id === row!.primary_source_id)?.trust ?? "low"] ?? 1;
-          const canOverride = TRUST_RANK[src.trust] >= primaryTrust || !row.primary_source_id;
+          const canOverride = (TRUST_RANK[src.trust] ?? 1) >= primaryTrust || !row.primary_source_id;
           const setField = (field: keyof AnimeRow, value: unknown) => {
             if (value === null || value === undefined || (Array.isArray(value) && !value.length)) return;
             const old = row![field] as unknown;
