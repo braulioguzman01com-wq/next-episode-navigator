@@ -93,14 +93,10 @@ export async function runSync(db: DB, trigger: "cron" | "manual", onlySourceId?:
       const existing = await loadExisting(db, items, touched);
       for (const it of items) {
         const keys = matchKeys([it.title, it.title_english, it.title_native, ...it.synonyms]);
-        let row =
-          (it.anilist_id && existing.byAnilist.get(it.anilist_id)) ||
-          (it.mal_id && existing.byMal.get(it.mal_id)) ||
-          findByKeys(existing.byKey, keys, it.year);
-        if (row && (row.anilist_id !== (it.anilist_id ?? row.anilist_id) || (!row.anilist_id && !it.anilist_id && row.mal_id !== it.mal_id))) stats.merged++;
-        else if (row && touched.has(row.id) && !isNew.has(row.id)) stats.merged += 0;
-        if (row && touched.has(row.id) && src.integration_method !== "anilist" && row.anilist_id && !it.anilist_id) stats.merged++;
-
+        const byId = (it.anilist_id && existing.byAnilist.get(it.anilist_id)) || (it.mal_id && existing.byMal.get(it.mal_id)) || undefined;
+        const viaKeys = byId ? undefined : findByKeys(existing.byKey, keys, it.year);
+        let row: AnimeRow | undefined = byId || viaKeys;
+        if (viaKeys || (byId && touched.has(byId.id) && !isNew.has(byId.id) === false && byId.primary_source_id !== src.id)) stats.merged++;
         if (!row) {
           const id = crypto.randomUUID();
           row = {
@@ -118,7 +114,7 @@ export async function runSync(db: DB, trigger: "cron" | "manual", onlySourceId?:
           history.push({ anime_id: id, run_id: runId, source_id: src.id, kind: "new_anime", new_value: it.title });
         } else {
           row = { ...row };
-          const primaryTrust = TRUST_RANK[sources!.find((s) => s.id === row!.primary_source_id)?.trust ?? videoSources!.find(() => false)?.trust ?? "low"] ?? 1;
+          const primaryTrust = TRUST_RANK[sources!.find((s) => s.id === row!.primary_source_id)?.trust ?? "low"] ?? 1;
           const canOverride = TRUST_RANK[src.trust] >= primaryTrust || !row.primary_source_id;
           const setField = (field: keyof AnimeRow, value: unknown) => {
             if (value === null || value === undefined || (Array.isArray(value) && !value.length)) return;
