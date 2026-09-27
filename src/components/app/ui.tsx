@@ -146,7 +146,7 @@ export function useDebounced<T>(v: T, ms = 300) {
   return d;
 }
 
-export function LargeTitle({ title, subtitle, right }: { title: string; subtitle?: string; right?: ReactNode }) {
+export function LargeTitle({ title, subtitle, right }: { title: string; subtitle?: string | undefined; right?: ReactNode }) {
   return (
     <header className="pt-safe flex items-end justify-between gap-3 pb-4 pt-6">
       <div>
@@ -158,7 +158,7 @@ export function LargeTitle({ title, subtitle, right }: { title: string; subtitle
   );
 }
 
-export function SectionTitle({ children, count }: { children: ReactNode; count?: number }) {
+export function SectionTitle({ children, count }: { children: ReactNode; count?: number | undefined }) {
   return (
     <h2 className="mb-1 mt-7 flex items-baseline gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
       {children}

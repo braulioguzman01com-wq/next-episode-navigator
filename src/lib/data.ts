@@ -9,7 +9,7 @@ export type CardAnime = {
   latest_episode_at: string | null; episodes: number | null; year: number | null; season: string | null; genres: string[];
 };
 
-export type Filters = { q?: string; year?: number; season?: string; genre?: string; status?: string };
+export type Filters = { q?: string | undefined; year?: number | undefined; season?: string | undefined; genre?: string | undefined; status?: string | undefined };
 
 function applyFilters<T extends { ilike: any; eq: any; contains: any }>(q: T, f: Filters): T {
   let r: any = q;
