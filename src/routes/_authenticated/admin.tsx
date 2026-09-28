@@ -154,10 +154,10 @@ function Animes() {
       await supabase.from("episodes").delete().eq("anime_id", id);
       await supabase.from("news_items").update({ anime_id: null }).eq("anime_id", id);
       const { error } = await supabase.from("animes").delete().eq("id", id);
-      if (error) return toast.error("No se pudo eliminar: " + error.message);
+      if (error) { toast.error("No se pudo eliminar: " + error.message); return; }
     } else {
       const { error } = await supabase.from("animes").update(patch).eq("id", id);
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
     }
     toast.success("Hecho");
     qc.invalidateQueries({ queryKey: ["adm-animes"] });
@@ -190,12 +190,12 @@ function AnimeEditor({ id }: { id: string }) {
   const qc = useQueryClient();
   const a = useQuery({ queryKey: ["adm-anime", id], queryFn: async () => (await supabase.from("animes").select("*").eq("id", id).single()).data });
   const hist = useQuery({ queryKey: ["adm-hist", id], queryFn: async () => (await supabase.from("change_history").select("*").eq("anime_id", id).order("id", { ascending: false }).limit(30)).data ?? [] });
-  const [form, setForm] = useState<Record<string, string> | null>(null);
+  const [form, setForm] = useState<{ title: string; synopsis: string; studio: string; status: string; episodes: string } | null>(null);
   if (!a.data) return <p className="text-sm text-muted-foreground">Cargando…</p>;
   const f = form ?? { title: a.data.title, synopsis: a.data.synopsis ?? "", studio: a.data.studio ?? "", status: a.data.status ?? "", episodes: String(a.data.episodes ?? "") };
   const save = async () => {
-    const { error } = await supabase.from("animes").update({ title: f.title!, synopsis: f.synopsis || null, studio: f.studio || null, status: f.status || null, episodes: f.episodes ? Number(f.episodes) : null, updated_at: new Date().toISOString() }).eq("id", id);
-    if (error) return toast.error(error.message);
+    const { error } = await supabase.from("animes").update({ title: f.title, synopsis: f.synopsis || null, studio: f.studio || null, status: f.status || null, episodes: f.episodes ? Number(f.episodes) : null, updated_at: new Date().toISOString() }).eq("id", id);
+    if (error) { toast.error(error.message); return; }
     toast.success("Guardado");
     qc.invalidateQueries({ queryKey: ["adm-animes"] });
     qc.invalidateQueries({ queryKey: ["adm-anime", id] });
@@ -224,7 +224,7 @@ function Episodios() {
     if (!confirm("¿Eliminar este episodio?")) return;
     await supabase.from("watch_links").delete().eq("episode_id", id);
     const { error } = await supabase.from("episodes").delete().eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     qc.invalidateQueries({ queryKey: ["adm-eps"] });
   };
   if (list.data?.length === 0) return <p className="text-muted-foreground">Todavía no hay episodios. Ejecuta una sincronización.</p>;
@@ -263,7 +263,7 @@ function Fuentes() {
       const r = await doTest(nw.site_url, nw.feed_url);
       if (!r.site.ok || (r.feed && !r.feed.ok)) return;
       const { error } = await supabase.from("sources").insert({ name: nw.name, kind: nw.kind, site_url: nw.site_url, feed_url: nw.feed_url || null, integration_method: nw.kind === "video" ? "link" : "rss", trust: "medium" });
-      if (error) return toast.error(error.message);
+      if (error) { toast.error(error.message); return; }
       setNw({ name: "", kind: "news", site_url: "", feed_url: "" });
       qc.invalidateQueries({ queryKey: ["adm-sources"] });
     } catch (e) {
@@ -375,10 +375,10 @@ function Cuenta({ email }: { email?: string | undefined }) {
   const [p1, setP1] = useState("");
   const [p2, setP2] = useState("");
   const save = async () => {
-    if (p1.length < 8) return toast.error("Mínimo 8 caracteres.");
-    if (p1 !== p2) return toast.error("Las contraseñas no coinciden.");
+    if (p1.length < 8) { toast.error("Mínimo 8 caracteres."); return; }
+    if (p1 !== p2) { toast.error("Las contraseñas no coinciden."); return; }
     const { error } = await supabase.auth.updateUser({ password: p1 });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setP1(""); setP2("");
     toast.success("Contraseña actualizada.");
   };
