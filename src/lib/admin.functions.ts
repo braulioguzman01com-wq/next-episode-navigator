@@ -38,7 +38,7 @@ export const testSourceUrl = createServerFn({ method: "POST" })
     if (data.feedUrl) {
       try {
         const r = await rssAdapter(data.feedUrl);
-        out.feed = { ok: r.items.length > 0, items: r.items.length, error: r.items.length ? undefined : "El feed no contiene elementos" };
+        out.feed = { ok: r.items.length > 0, items: r.items.length, ...(r.items.length ? {} : { error: "El feed no contiene elementos" }) };
       } catch (e) {
         out.feed = { ok: false, error: (e as Error).message };
       }

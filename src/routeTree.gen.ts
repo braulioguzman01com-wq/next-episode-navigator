@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AjustesRouteImport } from './routes/ajustes'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as GuardadosRouteImport } from './routes/guardados'
 import { Route as VideosRouteImport } from './routes/videos'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
@@ -22,9 +25,18 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AjustesRoute = AjustesRouteImport.update({
   id: '/ajustes',
   path: '/ajustes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuardadosRoute = GuardadosRouteImport.update({
@@ -36,6 +48,11 @@ const VideosRoute = VideosRouteImport.update({
   id: '/videos',
   path: '/videos',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AnimeIdRoute = AnimeIdRouteImport.update({
   id: '/anime/$id',
@@ -56,8 +73,10 @@ const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/auth': typeof AuthRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -65,8 +84,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
+  '/auth': typeof AuthRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -74,9 +95,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/ajustes': typeof AjustesRoute
+  '/auth': typeof AuthRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
@@ -86,8 +110,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/ajustes'
+    | '/auth'
     | '/guardados'
     | '/videos'
+    | '/admin'
     | '/anime/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
@@ -95,17 +121,22 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/ajustes'
+    | '/auth'
     | '/guardados'
     | '/videos'
+    | '/admin'
     | '/anime/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/ajustes'
+    | '/auth'
     | '/guardados'
     | '/videos'
+    | '/_authenticated/admin'
     | '/anime/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
@@ -113,7 +144,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AjustesRoute: typeof AjustesRoute
+  AuthRoute: typeof AuthRoute
   GuardadosRoute: typeof GuardadosRoute
   VideosRoute: typeof VideosRoute
   AnimeIdRoute: typeof AnimeIdRoute
@@ -130,11 +163,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/ajustes': {
       id: '/ajustes'
       path: '/ajustes'
       fullPath: '/ajustes'
       preLoaderRoute: typeof AjustesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guardados': {
@@ -150,6 +197,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/videos'
       preLoaderRoute: typeof VideosRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/anime/$id': {
       id: '/anime/$id'
@@ -175,9 +229,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AjustesRoute: AjustesRoute,
+  AuthRoute: AuthRoute,
   GuardadosRoute: GuardadosRoute,
   VideosRoute: VideosRoute,
   AnimeIdRoute: AnimeIdRoute,
