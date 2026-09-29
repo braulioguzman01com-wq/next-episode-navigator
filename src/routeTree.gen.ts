@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as BuscarRouteImport } from './routes/buscar'
 import { Route as GuardadosRouteImport } from './routes/guardados'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
+import { Route as CatalogoIdRouteImport } from './routes/catalogo.$id'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 
@@ -39,6 +41,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BuscarRoute = BuscarRouteImport.update({
+  id: '/buscar',
+  path: '/buscar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const GuardadosRoute = GuardadosRouteImport.update({
   id: '/guardados',
   path: '/guardados',
@@ -59,6 +66,11 @@ const AnimeIdRoute = AnimeIdRouteImport.update({
   path: '/anime/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatalogoIdRoute = CatalogoIdRouteImport.update({
+  id: '/catalogo/$id',
+  path: '/catalogo/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
   id: '/api/public/bootstrap-admin',
   path: '/api/public/bootstrap-admin',
@@ -74,10 +86,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
@@ -85,10 +99,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/ajustes': typeof AjustesRoute
   '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
@@ -98,10 +114,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/ajustes': typeof AjustesRoute
   '/auth': typeof AuthRoute
+  '/buscar': typeof BuscarRoute
   '/guardados': typeof GuardadosRoute
   '/videos': typeof VideosRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
+  '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
@@ -111,10 +129,12 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/auth'
+    | '/buscar'
     | '/guardados'
     | '/videos'
     | '/admin'
     | '/anime/$id'
+    | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
   fileRoutesByTo: FileRoutesByTo
@@ -122,10 +142,12 @@ export interface FileRouteTypes {
     | '/'
     | '/ajustes'
     | '/auth'
+    | '/buscar'
     | '/guardados'
     | '/videos'
     | '/admin'
     | '/anime/$id'
+    | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
   id:
@@ -134,10 +156,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/ajustes'
     | '/auth'
+    | '/buscar'
     | '/guardados'
     | '/videos'
     | '/_authenticated/admin'
     | '/anime/$id'
+    | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
     | '/api/public/sync'
   fileRoutesById: FileRoutesById
@@ -147,9 +171,11 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AjustesRoute: typeof AjustesRoute
   AuthRoute: typeof AuthRoute
+  BuscarRoute: typeof BuscarRoute
   GuardadosRoute: typeof GuardadosRoute
   VideosRoute: typeof VideosRoute
   AnimeIdRoute: typeof AnimeIdRoute
+  CatalogoIdRoute: typeof CatalogoIdRoute
   ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
 }
@@ -184,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/buscar': {
+      id: '/buscar'
+      path: '/buscar'
+      fullPath: '/buscar'
+      preLoaderRoute: typeof BuscarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/guardados': {
       id: '/guardados'
       path: '/guardados'
@@ -210,6 +243,13 @@ declare module '@tanstack/react-router' {
       path: '/anime/$id'
       fullPath: '/anime/$id'
       preLoaderRoute: typeof AnimeIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catalogo/$id': {
+      id: '/catalogo/$id'
+      path: '/catalogo/$id'
+      fullPath: '/catalogo/$id'
+      preLoaderRoute: typeof CatalogoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/bootstrap-admin': {
@@ -245,9 +285,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AjustesRoute: AjustesRoute,
   AuthRoute: AuthRoute,
+  BuscarRoute: BuscarRoute,
   GuardadosRoute: GuardadosRoute,
   VideosRoute: VideosRoute,
   AnimeIdRoute: AnimeIdRoute,
+  CatalogoIdRoute: CatalogoIdRoute,
   ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
 }

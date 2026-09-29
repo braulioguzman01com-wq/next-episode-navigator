@@ -1,11 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Bookmark, CalendarClock, PlayCircle, Settings, WifiOff } from "lucide-react";
+import { Bookmark, CalendarClock, PlayCircle, Search, Settings, WifiOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { to: "/", label: "Nuevos", icon: CalendarClock },
+  { to: "/buscar", label: "Buscar", icon: Search },
   { to: "/videos", label: "Videos", icon: PlayCircle },
   { to: "/guardados", label: "Guardados", icon: Bookmark },
   { to: "/ajustes", label: "Configuración", icon: Settings },
