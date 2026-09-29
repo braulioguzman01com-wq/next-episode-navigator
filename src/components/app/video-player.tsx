@@ -6,13 +6,13 @@ type Props = {
   type: SourceType;
   url: string;
   progressKey: string;
-  subtitles?: { src: string; lang: string; label: string }[];
+  subtitles?: { src: string; lang: string; label: string }[] | undefined;
   onStart?: () => void;
 };
 
 const fmt = (s: number) => (isFinite(s) ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}` : "0:00");
 
-export function VideoPlayer({ type, url, progressKey, subtitles = [], onStart }: Props) {
+export function VideoPlayer({ type, url, progressKey, subtitles, onStart }: Props) {
   const wrap = useRef<HTMLDivElement>(null);
   const v = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -69,7 +69,7 @@ export function VideoPlayer({ type, url, progressKey, subtitles = [], onStart }:
         onDurationChange={(e) => setD(e.currentTarget.duration)}
         onError={() => setErr("No se pudo cargar el vídeo.")}
       >
-        {subtitles.map((s, i) => <track key={s.src} kind="subtitles" src={s.src} srcLang={s.lang} label={s.label} default={i === 0} />)}
+        {(subtitles ?? []).map((s, i) => <track key={s.src} kind="subtitles" src={s.src} srcLang={s.lang} label={s.label} default={i === 0} />)}
       </video>
       {err && <div className="absolute inset-0 flex items-center justify-center text-sm text-destructive">{err}</div>}
       <div className="glass-strong absolute inset-x-2 bottom-2 flex items-center gap-2 rounded-xl px-3 py-2 text-[12px] opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
