@@ -262,6 +262,177 @@ export type Database = {
           },
         ]
       }
+      scan_errors: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: number
+          message: string | null
+          site_id: string | null
+          url: string | null
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: never
+          message?: string | null
+          site_id?: string | null
+          url?: string | null
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: never
+          message?: string | null
+          site_id?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scan_errors_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "scan_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scan_sites: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          last_chapters: number
+          last_contents: number
+          last_error: string | null
+          last_scan_at: string | null
+          name: string
+          scanning_until: string | null
+          status: string
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          last_chapters?: number
+          last_contents?: number
+          last_error?: string | null
+          last_scan_at?: string | null
+          name: string
+          scanning_until?: string | null
+          status?: string
+          url: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          last_chapters?: number
+          last_contents?: number
+          last_error?: string | null
+          last_scan_at?: string | null
+          name?: string
+          scanning_until?: string | null
+          status?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      site_chapters: {
+        Row: {
+          content_id: string
+          created_at: string
+          id: string
+          lang: string
+          number: number
+          page_url: string | null
+          play_url: string | null
+          title: string | null
+          updated_at: string
+          video_type: string | null
+        }
+        Insert: {
+          content_id: string
+          created_at?: string
+          id?: string
+          lang?: string
+          number: number
+          page_url?: string | null
+          play_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_type?: string | null
+        }
+        Update: {
+          content_id?: string
+          created_at?: string
+          id?: string
+          lang?: string
+          number?: number
+          page_url?: string | null
+          play_url?: string | null
+          title?: string | null
+          updated_at?: string
+          video_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_chapters_content_id_fkey"
+            columns: ["content_id"]
+            isOneToOne: false
+            referencedRelation: "site_contents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      site_contents: {
+        Row: {
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          missing_since: string | null
+          page_url: string | null
+          site_id: string
+          stable_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          missing_since?: string | null
+          page_url?: string | null
+          site_id: string
+          stable_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          missing_since?: string | null
+          page_url?: string | null
+          site_id?: string
+          stable_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "site_contents_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "scan_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       source_errors: {
         Row: {
           code: string

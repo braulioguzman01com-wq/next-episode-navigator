@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { AlertTriangle, BarChart3, Database, Film, KeyRound, ListVideo, LogOut, Menu, RefreshCw, Rss, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { syncNow, testSourceUrl } from "@/lib/admin.functions";
+import { Sitios } from "@/components/app/admin-sites";
 import { cn } from "@/lib/utils";
 
 const SECTIONS = [
@@ -14,6 +15,7 @@ const SECTIONS = [
   { id: "animes", label: "Animes", icon: Film },
   { id: "episodios", label: "Episodios", icon: ListVideo },
   { id: "fuentes", label: "Fuentes", icon: Rss },
+  { id: "sitios", label: "Mis sitios", icon: Database },
   { id: "sync", label: "Sincronización", icon: RefreshCw },
   { id: "errores", label: "Errores", icon: AlertTriangle },
   { id: "cuenta", label: "Cuenta", icon: KeyRound },
@@ -21,7 +23,7 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number]["id"];
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  validateSearch: z.object({ s: z.enum(["resumen", "animes", "episodios", "fuentes", "sync", "errores", "cuenta"]).optional() }),
+  validateSearch: z.object({ s: z.enum(["resumen", "animes", "episodios", "fuentes", "sitios", "sync", "errores", "cuenta"]).optional() }),
   head: () => ({
     meta: [
       { title: "Administración — Estrenos" },
@@ -102,6 +104,7 @@ function AdminPage() {
         {s === "animes" && <Animes />}
         {s === "episodios" && <Episodios />}
         {s === "fuentes" && <Fuentes />}
+        {s === "sitios" && <Sitios />}
         {s === "sync" && <Sync />}
         {s === "errores" && <Errores />}
         {s === "cuenta" && <Cuenta email={role.data.email} />}
