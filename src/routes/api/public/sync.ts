@@ -10,8 +10,10 @@ export const Route = createFileRoute("/api/public/sync")({
         if (denied) return denied;
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { runSync } = await import("@/lib/sync/engine.server");
-        const summary = await runSync(supabaseAdmin, "cron");
-        return Response.json(summary);
+        const summary = await runSync(supabaseAdmin, "cron").catch((e) => ({ error: (e as Error).message }));
+        const { runAllSiteScans } = await import("@/lib/scan/scanner.server");
+        const sites = await runAllSiteScans(supabaseAdmin).catch((e) => ({ error: (e as Error).message }));
+        return Response.json({ summary, sites });
       },
     },
   },
