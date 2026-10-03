@@ -59,7 +59,18 @@ export function Sitios() {
                   <div className="min-w-0 text-xs">
                     <p className="truncate text-sm font-medium">{c.title}</p>
                     <p className="text-muted-foreground">Portada {c.cover_url ? "encontrada" : "no encontrada"} · descripción {c.description ? "encontrada" : "no encontrada"} · {c.chapters.length} capítulos · {c.chapters.filter((x) => x.play_url).length} con video</p>
-                    {c.chapters.length > 0 && <p className="truncate text-muted-foreground">{c.chapters.slice(0, 12).map((x) => `${x.number}${x.lang !== "und" ? ` (${x.lang})` : ""}${x.video_type ? ` ${x.video_type}` : ""}`).join(" · ")}</p>}
+                    <p className="text-muted-foreground">Tipo: {c.kind} · Temporadas: {c.seasons.length ? c.seasons.join(", ") : "No confirmado"} · Título vía {c.checks.title_source} · {c.checks.pages} páginas{c.checks.rendered ? " · con JavaScript" : ""}</p>
+                    <p className={c.checks.url_ok && c.checks.same_content && c.checks.numbers_ok ? "text-muted-foreground" : "text-destructive"}>Verificación: URL {c.checks.url_ok ? "OK" : "falla"} · portada {c.checks.cover_ok === null ? "No confirmado" : c.checks.cover_ok ? "OK" : "dudosa"} · episodios {c.checks.same_content ? "del mismo contenido" : "mezclados"} · números {c.checks.numbers_ok ? "válidos" : "inválidos"}</p>
+                    {c.chapters.length > 0 && (
+                      <ul className="mt-1 max-h-48 space-y-0.5 overflow-y-auto">
+                        {c.chapters.map((x) => { const k = c.chapter_checks[`${x.number}|${x.lang}`]; return (
+                          <li key={`${x.number}|${x.lang}`} className="flex min-w-0 gap-2">
+                            <span className="w-8 shrink-0 tabular-nums">{String(x.number).padStart(2, "0")}</span>
+                            <span className="min-w-0 flex-1 truncate">{x.title ?? `Episodio ${x.number}`}{x.page_url ? <a href={x.page_url} target="_blank" rel="noreferrer" className="ml-1 text-muted-foreground underline">URL</a> : null}</span>
+                            <span className="shrink-0 text-muted-foreground">embed {k?.embed === "ok" ? "OK" : k?.embed === "none" ? "no" : "sin probar"} · {k?.page_ok === null || !k ? "sin verificar" : k.page_ok ? "verificado" : "falla"}</span>
+                          </li>); })}
+                      </ul>
+                    )}
                   </div>
                 </div>
               ))}
@@ -90,7 +101,7 @@ export function Sitios() {
               <p className="text-xs text-muted-foreground">Último escaneo: {fmt(s.last_scan_at)} · {s.last_contents} contenidos · {s.last_chapters} capítulos{s.last_error ? ` · ${s.last_error}` : ""}</p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Btn disabled={busy === s.id} onClick={() => wrap(s.id, async () => report((await scan({ data: { id: s.id } }))[0]))}>{busy === s.id ? "Escaneando…" : "Analizar ahora"}</Btn>
+              <Btn disabled={busy === s.id} onClick={() => wrap(s.id, async () => { report((await scan({ data: { id: s.id } }))[0]); })}>{busy === s.id ? "Escaneando…" : "Analizar ahora"}</Btn>
               <Btn variant="ghost" onClick={() => setOpen(open === s.id ? null : s.id)}>{open === s.id ? "Ocultar" : "Contenidos"}</Btn>
               <Btn variant="ghost" onClick={() => (setForm({ id: s.id, name: s.name, url: s.url }), setPreview(null), window.scrollTo({ top: 0, behavior: "smooth" }))}>Editar</Btn>
               <Btn variant="ghost" onClick={() => wrap("st" + s.id, async () => void (await setState({ data: { id: s.id, action: s.active ? "deactivate" : "activate" } })))}>{s.active ? "Desactivar" : "Activar"}</Btn>
