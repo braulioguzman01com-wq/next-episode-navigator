@@ -1,7 +1,9 @@
 import { fetchWithPolicy, SourceError } from "@/lib/sync/http.server";
 
 export type ScanChapter = { number: number; lang: string; title: string | null; page_url: string | null; play_url: string | null; video_type: string | null };
-export type ScanContent = { stable_key: string; title: string; description: string | null; cover_url: string | null; page_url: string | null; chapters: ScanChapter[] };
+export type ChapterCheck = { season: number | null; page_ok: boolean | null; embed: "ok" | "none" | "unchecked" };
+export type ScanChecks = { url_ok: boolean; title_source: string; cover_ok: boolean | null; numbers_ok: boolean; same_content: boolean; pages: number; rendered: boolean };
+export type ScanContent = { stable_key: string; title: string; description: string | null; cover_url: string | null; page_url: string | null; chapters: ScanChapter[]; kind: "sub" | "dub" | "ambos" | "No confirmado"; seasons: number[]; checks: ScanChecks; chapter_checks: Record<string, ChapterCheck> };
 export type ScanResult = { contents: ScanContent[]; strategy: string; errors: { code: string; message: string; url: string }[]; ms: number };
 
 const MAX_CONTENTS = 30;
@@ -70,8 +72,11 @@ export function detectVideo(html: string, base: string): { url: string; type: st
     const s = abs(attr(tag, "src") ?? attr(tag, "data-src"), base);
     if (s) return { url: s, type: /\.m3u8/i.test(s) ? "hls" : /\.webm/i.test(s) ? "webm" : "mp4" };
   }
+  for (const v of fromJsonLdVideo(html, base)) return v;
+  {
+  }
   const direct = /["'](https?:\/\/[^"'\s]+?\.(m3u8|mp4|webm)(?:\?[^"'\s]*)?)["']/i.exec(html);
-  if (direct) return { url: direct[1], type: direct[2].toLowerCase() === "m3u8" ? "hls" : direct[2].toLowerCase() };
+  if (direct?.[1] && direct[2]) return { url: direct[1], type: direct[2].toLowerCase() === "m3u8" ? "hls" : direct[2].toLowerCase() };
   for (const tag of html.match(/<iframe\s[^>]*>/gi) ?? []) {
     const s = abs(attr(tag, "src") ?? attr(tag, "data-src"), base);
     if (!s) continue;
@@ -81,6 +86,64 @@ export function detectVideo(html: string, base: string): { url: string; type: st
   }
   const ogv = meta(html, ["og:video", "og:video:url", "og:video:secure_url", "twitter:player"]);
   return ogv ? { url: abs(ogv, base)!, type: /\.m3u8/.test(ogv) ? "hls" : /youtu/.test(ogv) ? "youtube" : "iframe" } : null;
+}
+
+/** Optional server-side JS rendering via Firecrawl (only if the connector is linked). */
+async function renderJs(url: string): Promise<string | null> {
+  const key = process.env["FIRECRAWL_API_KEY"];
+  if (!key) return null;
+  const gw = key.startsWith("lovc_");
+  const lk = process.env["LOVABLE_API_KEY"];
+  if (gw && !lk) return null;
+  try {
+    const res = await fetch(gw ? "https://connector-gateway.lovable.dev/firecrawl/v2/scrape" : "https://api.firecrawl.dev/v2/scrape", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(gw ? { Authorization: `Bearer ${lk}`, "X-Connection-Api-Key": key } : { Authorization: `Bearer ${key}` }) },
+      body: JSON.stringify({ url, formats: ["rawHtml"], onlyMainContent: false, waitFor: 1500 }),
+    });
+    if (!res.ok) return null;
+    const j: any = await res.json();
+    return j.rawHtml ?? j.data?.rawHtml ?? null;
+  } catch { return null; }
+}
+
+function fromJsonLdVideo(html: string, base: string): { url: string; type: string }[] {
+  const out: { url: string; type: string }[] = [];
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) {
+    try {
+      const walk = (o: any): void => { if (!o || typeof o !== "object") return; if (Array.isArray(o)) return o.forEach(walk); if (/VideoObject/.test(String(o["@type"]))) { const u = abs(o.embedUrl ?? o.contentUrl, base); if (u) out.push({ url: u, type: /\.m3u8/.test(u) ? "hls" : /\.(mp4|webm)/.test(u) ? "mp4" : /youtu/.test(u) ? "youtube" : "iframe" }); } if (o["@graph"]) walk(o["@graph"]); };
+      walk(JSON.parse(m[1] ?? ""));
+    } catch { /* ignore */ }
+  }
+  return out;
+}
+
+const PAGE_RE = /[?&](?:page|p|pagina|pg)=(\d{1,3})\b|\/(?:page|pagina|p)\/(\d{1,3})\/?$/i;
+const MAX_PAGES = 30;
+/** Finds pagination links ("1 2 3 … 25") on the same path family. */
+function paginationUrls(html: string, base: string): string[] {
+  const host = new URL(base).host;
+  const nums = new Map<number, string>();
+  let tpl: string | null = null;
+  for (const m of html.matchAll(/<a\s([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const href = abs(attr("<a " + (m[1] ?? ""), "href"), base);
+    if (!href) continue;
+    try { if (new URL(href).host !== host) continue; } catch { continue; }
+    const pm = PAGE_RE.exec(href);
+    const n = Number(pm?.[1] ?? pm?.[2]);
+    if (!pm || !Number.isFinite(n) || n < 2) continue;
+    nums.set(n, href); tpl ??= href;
+  }
+  if (!nums.size || !tpl) return [];
+  const max = Math.min(Math.max(...nums.keys()), MAX_PAGES);
+  const out: string[] = [];
+  for (let n = 2; n <= max; n++) out.push(nums.get(n) ?? tpl.replace(PAGE_RE, (x) => x.replace(/\d{1,3}/, String(n))));
+  return [...new Set(out)];
+}
+
+function seasonOf(s: string): number | null {
+  const m = /(?:temporada|season|\bs)\s*[-_]?\s*(\d{1,2})\b/i.exec(s);
+  return m ? Number(m[1]) : null;
 }
 
 async function getText(url: string, errors: ScanResult["errors"]): Promise<string | null> {
@@ -100,7 +163,7 @@ async function getText(url: string, errors: ScanResult["errors"]): Promise<strin
 async function pool<T, R>(items: T[], n: number, fn: (x: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let i = 0;
-  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const k = i++; out[k] = await fn(items[k]); } }));
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const k = i++; out[k] = await fn(items[k] as T); } }));
   return out;
 }
 
@@ -117,7 +180,7 @@ function fromJsonLd(html: string, base: string): Card[] {
     if (o.itemListElement) walk([].concat(o.itemListElement).map((x: any) => x.item ?? x));
     if (o["@graph"]) walk(o["@graph"]);
   };
-  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) { try { walk(JSON.parse(m[1])); } catch { /* JSON inválido: ignorar */ } }
+  for (const m of html.matchAll(/<script[^>]+application\/ld\+json[^>]*>([\s\S]*?)<\/script>/gi)) { try { walk(JSON.parse(m[1] ?? "")); } catch { /* JSON inválido: ignorar */ } }
   return out;
 }
 
@@ -167,11 +230,11 @@ function chaptersIn(html: string, base: string, contentUrl: string | null): Scan
   const host = new URL(base).host;
   const map = new Map<string, ScanChapter>();
   for (const m of html.matchAll(/<a\s([^>]*)>([\s\S]*?)<\/a>/gi)) {
-    const href = abs(attr("<a " + m[1], "href"), base);
+    const href = abs(attr("<a " + (m[1] ?? ""), "href"), base);
     if (!href || href === contentUrl) continue;
     const isMedia = /\.(m3u8|mp4|webm)(\?|$)/i.test(href);
     try { if (!isMedia && new URL(href).host !== host) continue; } catch { continue; }
-    const text = decode(m[2]) || attr("<a " + m[1], "title") || "";
+    const text = decode(m[2] ?? "") || attr("<a " + (m[1] ?? ""), "title") || "";
     const n = chapterNumber(text, href);
     if (n === null || (!CH_RE.test(text) && !URL_CH_RE.test(href) && !isMedia)) continue;
     const lang = langOf(text + " " + href);
@@ -202,23 +265,56 @@ export async function scanSite(url: string, opts: { deep?: boolean } = {}): Prom
   const contents = await pool(cards, 4, async (c): Promise<ScanContent> => {
     let chapters: ScanChapter[] = [];
     let { title, description, cover_url } = c;
-    const page = c.page_url === url ? html : c.page_url ? await getText(c.page_url, errors) : null;
+    let page = c.page_url === url ? html : c.page_url ? await getText(c.page_url, errors) : null;
+    let pages = page ? 1 : 0, rendered = false, titleSource = "listado";
+    const urlOk = !!page;
     if (page && c.page_url) {
-      title = meta(page, ["og:title"])?.replace(/\s*[|–-]\s*[^|–-]+$/, "") || title;
-      description = meta(page, ["og:description", "description", "twitter:description"]) ?? description;
-      cover_url = abs(meta(page, ["og:image", "twitter:image"]), c.page_url) ?? cover_url;
+      // Priority: JSON-LD > Open Graph/meta > visible HTML.
+      const ld = fromJsonLd(page, c.page_url).find((x) => x.page_url === null || x.page_url === c.page_url) ?? fromJsonLd(page, c.page_url)[0];
+      const og = meta(page, ["og:title"])?.replace(/\s*[|–-]\s*[^|–-]+$/, "");
+      const h1 = decode(/<h1[^>]*>([\s\S]*?)<\/h1>/i.exec(page)?.[1] ?? "");
+      title = ld?.title || og || h1 || title;
+      titleSource = ld?.title ? "JSON-LD" : og ? "Open Graph" : h1 ? "HTML visible" : "listado";
+      description = ld?.description || meta(page, ["og:description", "description", "twitter:description"]) || description;
+      cover_url = ld?.cover_url || abs(meta(page, ["og:image", "twitter:image"]), c.page_url) || cover_url;
       chapters = chaptersIn(page, c.page_url, c.page_url);
+      if (!chapters.length) {
+        const r = await renderJs(c.page_url);
+        if (r) { rendered = true; page = r; chapters = chaptersIn(r, c.page_url, c.page_url); }
+      }
+      for (const pu of paginationUrls(page, c.page_url)) {
+        const p = await getText(pu, errors);
+        if (!p) continue;
+        pages++;
+        const seen = new Set(chapters.map((x) => `${x.number}|${x.lang}`));
+        for (const ch of chaptersIn(p, pu, c.page_url)) if (!seen.has(`${ch.number}|${ch.lang}`)) chapters.push(ch);
+      }
+      chapters.sort((a, b) => a.number - b.number);
       if (!chapters.length) { const v = detectVideo(page, c.page_url); if (v) chapters = [{ number: 1, lang: "und", title, page_url: c.page_url, play_url: v.url, video_type: v.type }]; }
     }
+    const cc: Record<string, ChapterCheck> = {};
+    for (const ch of chapters) cc[`${ch.number}|${ch.lang}`] = { season: seasonOf(`${ch.title ?? ""} ${ch.page_url ?? ""}`), page_ok: null, embed: ch.play_url ? "ok" : "unchecked" };
     if (opts.deep !== false) {
       const need = chapters.filter((ch) => !ch.play_url && ch.page_url).slice(0, MAX_CHAPTER_PAGES);
       await pool(need, 4, async (ch) => {
         const p = await getText(ch.page_url!, errors);
         const v = p ? detectVideo(p, ch.page_url!) : null;
+        const k = cc[`${ch.number}|${ch.lang}`]!;
+        k.page_ok = !!p; k.embed = v ? "ok" : "none";
         if (v) { ch.play_url = v.url; ch.video_type = v.type; }
       });
     }
-    return { stable_key: stableKey(c.page_url, title), title: title.slice(0, 300), description: description?.slice(0, 2000) ?? null, cover_url, page_url: c.page_url, chapters };
+    // Drop chapters that clearly belong to another series (different slug family).
+    const slug = c.page_url ? new URL(c.page_url).pathname.split("/").filter(Boolean).pop() ?? "" : "";
+    const sameContent = !slug || chapters.every((ch) => !ch.page_url || ch.page_url.includes(slug.slice(0, Math.max(4, Math.floor(slug.length / 2)))) || ch.page_url.startsWith(c.page_url!));
+    const langs = new Set(chapters.map((x) => x.lang));
+    const hasDub = [...langs].some((l) => l === "dub" || l === "es-419" || l === "es");
+    const hasSub = langs.has("sub") || (langs.has("und") && /sub/i.test(page ?? ""));
+    const kind = hasDub && hasSub ? "ambos" : hasDub ? "dub" : hasSub ? "sub" : "No confirmado";
+    const seasons = [...new Set(Object.values(cc).map((x) => x.season).filter((x): x is number => x !== null))].sort((a, b) => a - b);
+    const nums = chapters.map((x) => x.number);
+    const checks: ScanChecks = { url_ok: urlOk, title_source: titleSource, cover_ok: cover_url ? !/logo|favicon|placeholder|default/i.test(cover_url) : null, numbers_ok: nums.every((n) => n >= 0 && n < 5000), same_content: sameContent, pages, rendered };
+    return { stable_key: stableKey(c.page_url, title), title: title.slice(0, 300), description: description?.slice(0, 2000) ?? null, cover_url, page_url: c.page_url, chapters, kind, seasons, checks, chapter_checks: cc };
   });
   return { contents, strategy, errors, ms: Date.now() - started };
 }
