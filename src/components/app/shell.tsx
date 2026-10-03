@@ -62,15 +62,15 @@ function TabBar() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const active = (to: string) => (to === "/" ? path === "/" : path.startsWith(to));
   return (
-    <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)]">
-      <div className="glass-strong flex w-full max-w-md items-stretch justify-around rounded-[28px] p-1.5 shadow-[0_20px_50px_-15px_oklch(0_0_0/80%)]">
+    <nav aria-label="Principal" className="fixed inset-x-0 bottom-0 z-40 flex justify-center px-3 pb-[max(env(safe-area-inset-bottom),0.6rem)]">
+      <div className="glass-strong flex w-full max-w-md items-center justify-between rounded-full border border-border/40 px-2 py-1.5 shadow-[0_18px_40px_-12px_oklch(0_0_0/85%)]">
         {TABS.map(({ to, label, icon: Icon }) => {
           const on = active(to);
           return (
-            <Link key={to} to={to} viewTransition className={cn("press relative flex flex-1 flex-col items-center gap-0.5 rounded-[22px] py-1.5 text-[10.5px] font-medium transition-colors duration-300", on ? "text-primary" : "text-muted-foreground")}>
-              <span className={cn("absolute inset-0 rounded-[22px] bg-accent transition-opacity duration-300", on ? "opacity-100" : "opacity-0")} />
-              <Icon className="relative h-[22px] w-[22px]" strokeWidth={on ? 2.2 : 1.7} />
-              <span className="relative">{label}</span>
+            <Link key={to} to={to} viewTransition aria-label={label} aria-current={on ? "page" : undefined}
+              className={cn("press flex h-11 items-center justify-center gap-1.5 rounded-full transition-all duration-300 ease-out", on ? "bg-primary px-4 text-primary-foreground" : "w-11 text-muted-foreground hover:text-foreground")}>
+              <Icon className="h-[20px] w-[20px] shrink-0" strokeWidth={on ? 2.3 : 1.8} />
+              {on && <span className="whitespace-nowrap text-[13px] font-semibold">{label === "Configuración" ? "Ajustes" : label}</span>}
             </Link>
           );
         })}
