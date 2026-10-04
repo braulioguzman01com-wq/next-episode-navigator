@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Search, SearchX, Star, TriangleAlert } from "lucide-react";
-import { jikanGenres, jikanSearch, jikanTop, STATUS_ES, type JAnime } from "@/lib/jikan";
+import { jikanGenres, jikanSearch, STATUS_ES, type JAnime } from "@/lib/jikan";
 import { Chip, Cover, EmptyState, LargeTitle, PosterSkeleton, SearchField, SectionTitle, useDebounced } from "@/components/app/ui";
 
 export const Route = createFileRoute("/buscar")({
