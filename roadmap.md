@@ -5,3 +5,5 @@
 - [ ] Contraseña inicial del administrador (espera al usuario: ADMIN_INITIAL_PASSWORD)
 - [ ] Tarea programada cada 5 horas + primera sincronización real
 - [ ] Verificación en el navegador (móvil y escritorio)
+- [ ] Remodelar la interfaz pública según las referencias negras minimalistas
+- [ ] Cambiar el acceso administrativo a contraseña única
