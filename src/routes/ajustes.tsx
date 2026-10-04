@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/ajustes")({
   head: () => ({
     meta: [
-      { title: "Configuración | Estrenos" },
+      { title: "Ajustes | Estrenos" },
       { name: "description", content: "Tema, zona horaria, notificaciones y estado de las fuentes." },
-      { property: "og:title", content: "Configuración | Estrenos" },
+      { property: "og:title", content: "Ajustes | Estrenos" },
       { property: "og:description", content: "Tema, zona horaria, notificaciones y estado de las fuentes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -32,7 +32,7 @@ function Group({ title, icon: Icon, children, footer }: { title: string; icon: R
       <h2 className="mb-2 flex items-center gap-2 px-4 text-[13px] font-medium uppercase tracking-[0.06em] text-muted-foreground">
         <Icon className="h-3.5 w-3.5" /> {title}
       </h2>
-      <div className="glass divide-y divide-hairline overflow-hidden rounded-2xl">{children}</div>
+      <div className="divide-y divide-hairline overflow-hidden rounded-2xl bg-card">{children}</div>
       {footer && <p className="mt-2 px-4 text-[12px] text-muted-foreground">{footer}</p>}
     </section>
   );
@@ -73,7 +73,7 @@ function Ajustes() {
 
   return (
     <div className="animate-page">
-      <LargeTitle title="Configuración" />
+      <LargeTitle title="Ajustes" />
 
       <Group title="Apariencia" icon={Moon}>
         <div className="p-1.5">
