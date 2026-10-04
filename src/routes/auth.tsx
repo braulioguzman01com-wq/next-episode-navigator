@@ -1,6 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { KeyRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+
+const ADMIN_EMAIL = "mayil.ramos.kv@gmail.com";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -19,29 +23,31 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const nav = useNavigate();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-5">
       <form
-        className="glass w-full max-w-sm space-y-4 rounded-3xl p-6"
+        className="w-full max-w-sm space-y-5"
         onSubmit={async (e) => {
           e.preventDefault();
           setBusy(true);
           setErr(null);
-          const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+          const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password });
           setBusy(false);
-          if (error) return setErr("Correo o contraseña incorrectos.");
+          if (error) return setErr("Contraseña incorrecta.");
           nav({ to: "/admin" });
         }}
       >
-        <h1 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
-        <input type="email" required autoComplete="email" placeholder="Correo" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full rounded-xl bg-muted px-4 py-3 text-[15px] outline-none focus:ring-2 focus:ring-primary" />
-        <input type="password" required autoComplete="current-password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full rounded-xl bg-muted px-4 py-3 text-[15px] outline-none focus:ring-2 focus:ring-primary" />
+        <div className="mb-8 flex flex-col items-center text-center">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-card"><KeyRound className="h-7 w-7" /></div>
+          <h1 className="text-[32px] font-bold">Administración</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Introduce la contraseña para continuar</p>
+        </div>
+        <input autoFocus type="password" required autoComplete="current-password" placeholder="Contraseña" value={password} onChange={(e) => setPassword(e.target.value)} className="h-14 w-full rounded-2xl bg-card px-4 text-[17px] outline-none ring-offset-background focus:ring-2 focus:ring-ring" />
         {err && <p className="text-sm text-destructive">{err}</p>}
-        <button disabled={busy} className="press w-full rounded-full bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-60">{busy ? "Entrando…" : "Entrar"}</button>
+        <Button disabled={busy} size="lg" className="press h-13 w-full rounded-2xl text-[16px] font-semibold">{busy ? "Entrando…" : "Entrar"}</Button>
       </form>
     </div>
   );

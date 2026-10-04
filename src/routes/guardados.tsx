@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Bookmark } from "lucide-react";
+import { LibraryBig } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePrefs } from "@/lib/prefs";
 import { EmptyState, LargeTitle, ReleaseRow, RowSkeleton, SectionTitle } from "@/components/app/ui";
@@ -43,11 +43,11 @@ function Guardados() {
 
   return (
     <div className="animate-page">
-      <LargeTitle title="Guardados" subtitle={hydrated && ids.length ? `${ids.length} ${ids.length === 1 ? "anime" : "animes"}` : undefined} />
+       <LargeTitle title="Colección" subtitle={hydrated && ids.length ? `${ids.length} ${ids.length === 1 ? "anime" : "animes"}` : undefined} />
       {!hydrated || (isLoading && ids.length) ? (
         <RowSkeleton n={4} />
       ) : !ids.length ? (
-        <EmptyState icon={Bookmark} title="No hay animes guardados" text="Toca el icono de guardar en cualquier anime para seguirlo aquí." action={<Link to="/" className="press rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Descubrir estrenos</Link>} />
+        <EmptyState icon={LibraryBig} title="Tu colección está vacía" text="Los animes que guardes aparecerán aquí." action={<Link to="/buscar" className="press rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">Buscar anime</Link>} />
       ) : (
         <>
           {upcoming.length > 0 && (

@@ -8,3 +8,6 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Public navigation uses exactly four destinations: Inicio, Buscar, Colección, and Ajustes, because this matches the product's approved mobile information architecture.
+- The admin sign-in form collects only a password while the fixed admin identity remains internal, because the owner requested password-only access.

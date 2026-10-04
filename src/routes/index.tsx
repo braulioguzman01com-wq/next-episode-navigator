@@ -52,15 +52,14 @@ function Nuevos() {
   return (
     <div className="animate-page">
       <LargeTitle
-        title="Nuevos"
-        subtitle="Próximos estrenos"
+        title="Inicio"
         right={
           <button type="button" aria-label="Filtros" onClick={() => setShowFilters((s) => !s)} className={cn("press glass flex h-10 w-10 items-center justify-center rounded-full", showFilters && "text-primary")}>
             <SlidersHorizontal className="h-[18px] w-[18px]" />
           </button>
         }
       />
-      <SearchField value={q} onChange={setQ} placeholder="Buscar por nombre, alias o título japonés" />
+      <SearchField value={q} onChange={setQ} placeholder="Buscar" />
 
       <div className={cn("grid transition-[grid-template-rows,opacity] duration-300", showFilters ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
         <div className="overflow-hidden">
@@ -91,7 +90,7 @@ function Nuevos() {
       ) : isError ? (
         <EmptyState icon={CalendarX2} title="No se pudo cargar" text="Revisa tu conexión e inténtalo de nuevo." action={<button onClick={() => refetch()} className="press rounded-full bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground">Reintentar</button>} />
       ) : !data?.length ? (
-        <EmptyState icon={CalendarX2} title={filters.q ? "No hay resultados" : "No hay estrenos programados"} text={filters.q ? "Prueba con otro nombre o alias." : "La información se actualiza automáticamente cada 5 horas."} />
+        <EmptyState icon={CalendarX2} title={filters.q ? "No hay resultados" : "Aún no hay estrenos"} text={filters.q ? "Prueba con otro nombre." : "Los nuevos animes aparecerán aquí."} />
       ) : (
         BUCKETS.filter((b) => groups.get(b)?.length).map((b) => (
           <section key={b}>

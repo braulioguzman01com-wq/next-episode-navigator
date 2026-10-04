@@ -8,7 +8,7 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
   server: {
     handlers: {
       POST: async () => {
-        const password = process.env["ADMIN_INITIAL_PASSWORD"];
+        const password = process.env["ADMIN_LOGIN_PASSWORD"] ?? process.env["ADMIN_INITIAL_PASSWORD"];
         if (!password || password.length < 8) return Response.json({ ok: false, reason: "secret_missing" }, { status: 400 });
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { data: list } = await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 200 });
@@ -19,6 +19,9 @@ export const Route = createFileRoute("/api/public/bootstrap-admin")({
           if (error) return Response.json({ ok: false, reason: "create_failed" }, { status: 500 });
           user = data.user;
           created = true;
+        } else {
+          const { error } = await supabaseAdmin.auth.admin.updateUserById(user.id, { password });
+          if (error) return Response.json({ ok: false, reason: "update_failed" }, { status: 500 });
         }
         await supabaseAdmin.from("user_roles").upsert({ user_id: user!.id, role: "admin" }, { onConflict: "user_id,role", ignoreDuplicates: true });
         return Response.json({ ok: true, created });

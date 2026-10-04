@@ -118,13 +118,13 @@ export function PosterCard({ a, subtitle, className }: { a: CardAnime; subtitle?
 
 export function SearchField({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
   return (
-    <label className="glass flex h-11 items-center gap-2 rounded-xl px-3 text-muted-foreground focus-within:text-foreground">
-      <Search className="h-[18px] w-[18px] shrink-0" />
+    <label className="flex h-14 items-center gap-3 rounded-2xl bg-card px-4 text-muted-foreground focus-within:text-foreground">
+      <Search className="h-6 w-6 shrink-0" strokeWidth={2} />
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="h-full min-w-0 flex-1 bg-transparent text-[16px] text-foreground outline-none placeholder:text-muted-foreground"
+        className="h-full min-w-0 flex-1 bg-transparent text-[18px] text-foreground outline-none placeholder:text-muted-foreground"
         enterKeyHint="search"
         type="search"
       />
@@ -148,9 +148,9 @@ export function useDebounced<T>(v: T, ms = 300) {
 
 export function LargeTitle({ title, subtitle, right }: { title: string; subtitle?: string | undefined; right?: ReactNode }) {
   return (
-    <header className="pt-safe flex items-end justify-between gap-3 pb-4 pt-6">
+    <header className="pt-safe flex items-end justify-between gap-3 pb-8 pt-9">
       <div>
-        <h1 className="text-[34px] font-bold leading-none tracking-tight">{title}</h1>
+        <h1 className="text-[40px] font-bold leading-none">{title}</h1>
         {subtitle && <p className="mt-1.5 text-[15px] text-muted-foreground">{subtitle}</p>}
       </div>
       {right}
@@ -169,9 +169,9 @@ export function SectionTitle({ children, count }: { children: ReactNode; count?:
 
 export function EmptyState({ icon: Icon, title, text, action }: { icon: React.ComponentType<{ className?: string; strokeWidth?: number }>; title: string; text?: string; action?: ReactNode }) {
   return (
-    <div className="animate-page flex flex-col items-center px-8 py-16 text-center">
-      <div className="glass mb-4 flex h-16 w-16 items-center justify-center rounded-2xl text-muted-foreground">
-        <Icon className="h-7 w-7" strokeWidth={1.5} />
+    <div className="animate-page flex min-h-[52vh] flex-col items-center justify-center px-8 py-16 text-center">
+      <div className="mb-5 flex h-20 w-20 items-center justify-center text-muted-foreground">
+        <Icon className="h-14 w-14" strokeWidth={1.6} />
       </div>
       <p className="text-[17px] font-semibold">{title}</p>
       {text && <p className="mt-1 max-w-xs text-[14px] text-muted-foreground">{text}</p>}

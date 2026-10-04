@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { SearchX, Star, TriangleAlert } from "lucide-react";
+import { Search, SearchX, Star, TriangleAlert } from "lucide-react";
 import { jikanGenres, jikanSearch, jikanTop, STATUS_ES, type JAnime } from "@/lib/jikan";
 import { usePrefs } from "@/lib/prefs";
 import { Chip, Cover, EmptyState, LargeTitle, PosterSkeleton, SearchField, SectionTitle, useDebounced } from "@/components/app/ui";
@@ -49,14 +49,14 @@ function Buscar() {
 
   return (
     <div className="animate-page">
-      <LargeTitle title="Buscar" subtitle="Catálogo completo" />
-      <SearchField value={q} onChange={setQ} placeholder="Título en romaji, inglés o japonés" />
-      <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1">
+      <LargeTitle title="Buscar" />
+      <SearchField value={q} onChange={setQ} placeholder="Buscar" />
+      {active && <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 pb-1">
         {Array.from({ length: 8 }, (_, i) => now - i).map((y) => <Chip key={y} active={year === y} onClick={() => setYear(year === y ? undefined : y)}>{y}</Chip>)}
-      </div>
-      <div className="no-scrollbar -mx-5 mt-2 flex gap-2 overflow-x-auto px-5 pb-1">
+      </div>}
+      {active && <div className="no-scrollbar -mx-5 mt-2 flex gap-2 overflow-x-auto px-5 pb-1">
         {(genres.data ?? []).slice(0, 30).map((g) => <Chip key={g.mal_id} active={genre === g.mal_id} onClick={() => setGenre(genre === g.mal_id ? undefined : g.mal_id)}>{g.name}</Chip>)}
-      </div>
+      </div>}
 
       {active ? (
         <section>
@@ -72,7 +72,9 @@ function Buscar() {
           )}
         </section>
       ) : (
-        <>
+        top.isLoading ? <PosterSkeleton n={6} /> : !hero ? (
+          <EmptyState icon={Search} title="Empieza a escribir para buscar" />
+        ) : <>
           {hero && (
             <Link to="/catalogo/$id" params={{ id: String(hero.mal_id) }} className="press relative mt-5 block overflow-hidden rounded-3xl">
               <img src={hero.images.jpg.large_image_url ?? hero.images.jpg.image_url} alt="" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-50 blur-2xl" />
