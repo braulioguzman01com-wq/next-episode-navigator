@@ -13,9 +13,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/ajustes")({
   head: () => ({
     meta: [
-      { title: "Configuración | Estrenos" },
+      { title: "Ajustes | Estrenos" },
       { name: "description", content: "Tema, zona horaria, notificaciones y estado de las fuentes." },
-      { property: "og:title", content: "Configuración | Estrenos" },
+      { property: "og:title", content: "Ajustes | Estrenos" },
       { property: "og:description", content: "Tema, zona horaria, notificaciones y estado de las fuentes." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

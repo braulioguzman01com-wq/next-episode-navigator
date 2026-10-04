@@ -9,9 +9,9 @@ import type { CardAnime } from "@/lib/data";
 export const Route = createFileRoute("/guardados")({
   head: () => ({
     meta: [
-      { title: "Guardados — Tus animes | Estrenos" },
+      { title: "Colección — Tus animes | Estrenos" },
       { name: "description", content: "Tus animes guardados, ordenados por el próximo estreno." },
-      { property: "og:title", content: "Guardados — Tus animes" },
+      { property: "og:title", content: "Colección — Tus animes" },
       { property: "og:description", content: "Tus animes guardados, ordenados por el próximo estreno." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

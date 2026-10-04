@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nuevos — Próximos estrenos de anime | Estrenos" },
+      { title: "Inicio — Estrenos de anime" },
       { name: "description", content: "Estrenos de anime de hoy, mañana y esta semana, en tu zona horaria." },
-      { property: "og:title", content: "Nuevos — Próximos estrenos de anime" },
+      { property: "og:title", content: "Inicio — Estrenos de anime" },
       { property: "og:description", content: "Estrenos de anime de hoy, mañana y esta semana, en tu zona horaria." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
