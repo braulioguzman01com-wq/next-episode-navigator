@@ -128,28 +128,6 @@ function Ajustes() {
         <Row label="Guardados">{p.saved.length}</Row>
       </Group>
 
-      <Group title="Datos" icon={Database} footer="Tus guardados e historial se almacenan solo en este dispositivo.">
-        <Row label="Última sincronización">{st.data?.lastRun?.finished_at ? fmtDateTime(st.data.lastRun.finished_at, p.timezone) : "—"}</Row>
-        <Row label="Próxima sincronización">{p.hydrated ? fmtDateTime(nextCronRun().toISOString(), p.timezone) : "—"}</Row>
-        {st.data?.sources.map((s) => {
-          const x = SOURCE_STATUS[s.status] ?? { l: "Desactivada", c: "bg-muted-foreground" };
-          return (
-            <Row key={s.id} label={s.name}>
-              <span className="inline-flex items-center gap-1.5 text-[13px]"><span className={cn("h-1.5 w-1.5 rounded-full", x.c)} />{x.l}</span>
-            </Row>
-          );
-        })}
-        <button
-          onClick={() => {
-            p.clearData();
-            toast.success("Datos locales borrados");
-          }}
-          className="press flex min-h-12 w-full items-center gap-2 px-4 text-[15px] text-destructive"
-        >
-          <Trash2 className="h-4 w-4" /> Borrar guardados e historial
-        </button>
-      </Group>
-
       <Group title="Información" icon={Info} footer="Estrenos solo enlaza a plataformas oficiales. No aloja ni distribuye videos.">
         <Row label="Versión">{VERSION}</Row>
         <Row label="Datos de">AniList · MyAnimeList</Row>
