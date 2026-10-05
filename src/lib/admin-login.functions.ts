@@ -18,7 +18,7 @@ function matches(input: string, expected: string) {
 export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ password: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ data }) => {
-    const expected = process.env["ADMIN_LOGIN_PASSWORD"];
+    const expected = process.env["ADMIN_PASSCODE"] ?? process.env["ADMIN_LOGIN_PASSWORD"];
     if (!expected) return { ok: false as const, reason: "config" as const };
     const key = "admin";
     const now = Date.now();
