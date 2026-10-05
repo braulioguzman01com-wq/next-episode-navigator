@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { KeyRound } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-
-const ADMIN_EMAIL = "mayil.ramos.kv@gmail.com";
+import { adminLogin } from "@/lib/admin-login.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const nav = useNavigate();
+  const login = useServerFn(adminLogin);
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -34,10 +35,20 @@ function AuthPage() {
           e.preventDefault();
           setBusy(true);
           setErr(null);
-          const { error } = await supabase.auth.signInWithPassword({ email: ADMIN_EMAIL, password });
-          setBusy(false);
-          if (error) return setErr("Contraseña incorrecta.");
-          nav({ to: "/admin" });
+          try {
+            const r = await login({ data: { password } });
+            if (!r.ok) {
+              setBusy(false);
+              return setErr(r.reason === "wait" ? "Demasiados intentos. Espera 30 segundos." : r.reason === "config" ? "No se pudo iniciar sesión. Inténtalo de nuevo." : "Contraseña incorrecta.");
+            }
+            const { error } = await supabase.auth.verifyOtp({ token_hash: r.tokenHash, type: "magiclink" });
+            setBusy(false);
+            if (error) return setErr("No se pudo iniciar sesión. Inténtalo de nuevo.");
+            nav({ to: "/admin" });
+          } catch {
+            setBusy(false);
+            setErr("Sin conexión. Inténtalo de nuevo.");
+          }
         }}
       >
         <div className="mb-8 flex flex-col items-center text-center">

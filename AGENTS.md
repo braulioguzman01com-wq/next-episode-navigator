@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Public navigation uses exactly four destinations: Inicio, Buscar, Colección, and Ajustes, because this matches the product's approved mobile information architecture.
-- The admin sign-in form collects only a password while the fixed admin identity remains internal, because the owner requested password-only access.
+- The admin sign-in form collects only a password, checked server-side against a secret, which then issues a one-time sign-in token for the internal admin account, because the owner requested password-only access of any length.
