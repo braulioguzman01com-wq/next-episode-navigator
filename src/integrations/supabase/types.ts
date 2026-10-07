@@ -217,6 +217,105 @@ export type Database = {
           },
         ]
       }
+      ext_extensions: {
+        Row: {
+          base_url: string | null
+          compatible: boolean
+          icon_url: string | null
+          id: string
+          kind: string | null
+          lang: string | null
+          name: string
+          note: string | null
+          pkg: string
+          repo_id: string
+          site_id: string | null
+          updated_at: string
+          version: string | null
+        }
+        Insert: {
+          base_url?: string | null
+          compatible?: boolean
+          icon_url?: string | null
+          id?: string
+          kind?: string | null
+          lang?: string | null
+          name: string
+          note?: string | null
+          pkg: string
+          repo_id: string
+          site_id?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Update: {
+          base_url?: string | null
+          compatible?: boolean
+          icon_url?: string | null
+          id?: string
+          kind?: string | null
+          lang?: string | null
+          name?: string
+          note?: string | null
+          pkg?: string
+          repo_id?: string
+          site_id?: string | null
+          updated_at?: string
+          version?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ext_extensions_repo_id_fkey"
+            columns: ["repo_id"]
+            isOneToOne: false
+            referencedRelation: "ext_repos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ext_extensions_site_id_fkey"
+            columns: ["site_id"]
+            isOneToOne: false
+            referencedRelation: "scan_sites"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ext_repos: {
+        Row: {
+          created_at: string
+          ext_count: number
+          format: string | null
+          id: string
+          last_error: string | null
+          last_sync_at: string | null
+          name: string | null
+          status: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          ext_count?: number
+          format?: string | null
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          name?: string | null
+          status?: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          ext_count?: number
+          format?: string | null
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          name?: string | null
+          status?: string
+          url?: string
+        }
+        Relationships: []
+      }
       news_items: {
         Row: {
           anime_id: string | null

@@ -15,6 +15,13 @@
       "when": 1790881286928,
       "tag": "0001_site_scanner",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791396083975,
+      "tag": "0002_extension_repos",
+      "breakpoints": true
     }
   ]
 }
