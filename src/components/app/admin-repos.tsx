@@ -41,7 +41,7 @@ export function Repos() {
               <p className="text-xs text-muted-foreground">Última lectura: {fmt(r.last_sync_at)} · {r.ext_count} extensiones{r.last_error ? ` · ${r.last_error}` : ""}</p>
             </div>
             <div className="flex gap-2">
-              <button disabled={busy === r.id} className={cn(btn, "bg-primary text-primary-foreground")} onClick={() => run(r.id, async () => report(await act({ data: { id: r.id, action: "sync" } })))}>{busy === r.id ? "Sincronizando…" : "Sincronizar"}</button>
+              <button disabled={busy === r.id} className={cn(btn, "bg-primary text-primary-foreground")} onClick={() => run(r.id, async () => void report(await act({ data: { id: r.id, action: "sync" } })))}>{busy === r.id ? "Sincronizando…" : "Sincronizar"}</button>
               <button className={cn(btn, "bg-muted")} onClick={() => setOpen(open === r.id ? null : r.id)}>{open === r.id ? "Ocultar" : "Extensiones"}</button>
               <button className={cn(btn, "bg-destructive text-destructive-foreground")} onClick={() => confirm("¿Eliminar este repositorio? Las fuentes ya registradas se conservan en Mis sitios.") && run("d" + r.id, async () => void (await act({ data: { id: r.id, action: "delete" } })))}>Eliminar</button>
             </div>

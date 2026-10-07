@@ -4,9 +4,9 @@
 import { fetchWithPolicy } from "@/lib/sync/http.server";
 import { runSiteScan } from "@/lib/scan/scanner.server";
 
-export type ExtSource = { pkg: string; name: string; version?: string; lang?: string; kind?: string; icon_url?: string; base_url?: string };
+export type ExtSource = { pkg: string; name: string; version?: string | undefined; lang?: string | undefined; kind?: string | undefined; icon_url?: string | undefined; base_url?: string | undefined };
 
-const isUrl = (s: unknown): s is string => typeof s === "string" && /^https?:\/\/[^\s]+\.[^\s]+/.test(s);
+const isUrl = (s: unknown): boolean => typeof s === "string" && /^https?:\/\/[^\s]+\.[^\s]+/.test(s);
 const str = (v: unknown) => (v == null ? undefined : String(v));
 const KIND: Record<string, string> = { "0": "manga", "1": "video", "2": "novela" };
 
@@ -38,7 +38,7 @@ function fromJson(json: any, catalogUrl: string): ExtSource[] {
     const base = { pkg, name: str(e.name) ?? pkg, version: str(e.version), lang: str(e.lang), kind, icon_url: icon };
     const subs: any[] = Array.isArray(e.sources) ? e.sources : [];
     if (subs.length) for (const s of subs) out.push({ ...base, name: str(s.name) ?? base.name, lang: str(s.lang) ?? base.lang, base_url: isUrl(s.baseUrl) ? s.baseUrl : undefined });
-    else out.push({ ...base, base_url: [e.baseUrl, e.base_url, e.url, e.website].find(isUrl) });
+    else out.push({ ...base, base_url: [e.baseUrl, e.base_url, e.url, e.website].find((v) => isUrl(v)) as string | undefined });
   }
   return out;
 }
@@ -50,7 +50,7 @@ function fromProtobuf(buf: Uint8Array): ExtSource[] {
   const parse = (b: Uint8Array, depth: number): (string | null)[] | null => {
     let i = 0;
     const strings: string[] = [];
-    const varint = () => { let r = 0, s = 0, x; do { if (i >= b.length) throw 0; x = b[i++]; r += (x & 0x7f) * 2 ** s; s += 7; } while (x & 0x80); return r; };
+    const varint = () => { let r = 0, s = 0, x = 0; do { if (i >= b.length) throw 0; x = b[i++]!; r += (x & 0x7f) * 2 ** s; s += 7; } while (x & 0x80); return r; };
     try {
       while (i < b.length) {
         const tag = varint(), wt = tag & 7;
@@ -67,7 +67,7 @@ function fromProtobuf(buf: Uint8Array): ExtSource[] {
         } else return null;
       }
     } catch { return null; }
-    const url = strings.find(isUrl);
+    const url = strings.find((s) => isUrl(s));
     if (url) {
       const words = strings.filter((s) => !isUrl(s));
       const name = words.find((s) => s.length > 1 && !/^[a-z]{2}(-\w+)?$/.test(s) && !/^\d/.test(s)) ?? new URL(url).hostname;
@@ -132,7 +132,7 @@ export async function syncRepo(db: any, repoId: string, scanLimit = 3) {
       const x: any = await runSiteScan(db, id).catch(() => null);
       scanned++; contents += x?.found ?? 0;
     }
-    const name = repo.name ?? new URL(repo.url).pathname.split("/").filter(Boolean).slice(0, 2).join("/") || new URL(repo.url).hostname;
+    const name = repo.name ?? (new URL(repo.url).pathname.split("/").filter(Boolean).slice(0, 2).join("/") || new URL(repo.url).hostname);
     await db.from("ext_repos").update({ name, format: r.format, status: "ok", last_error: null, ext_count: rows.length, last_sync_at: new Date().toISOString() }).eq("id", repoId);
     return { extensions: rows.length, withUrl: rows.filter((x) => x.base_url).length, newSites, scanned, pending: Math.max(0, toScan.length - scanned), contents, format: r.format };
   } catch (e) {
