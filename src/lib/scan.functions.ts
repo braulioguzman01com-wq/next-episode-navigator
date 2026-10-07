@@ -58,3 +58,35 @@ export const updateSiteState = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const addRepo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ url }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { syncRepo } = await import("@/lib/scan/repos.server");
+    const { data: ex } = await supabaseAdmin.from("ext_repos").select("id").eq("url", data.url).maybeSingle();
+    let id = ex?.id;
+    if (!id) {
+      const { data: row, error } = await supabaseAdmin.from("ext_repos").insert({ url: data.url }).select("id").single();
+      if (error) throw new Error(error.message);
+      id = row.id;
+    }
+    return syncRepo(supabaseAdmin, id!);
+  });
+
+export const repoAction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ id: z.string().uuid(), action: z.enum(["sync", "delete"]) }).parse(d))
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (data.action === "delete") {
+      const { error } = await supabaseAdmin.from("ext_repos").delete().eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { ok: true };
+    }
+    const { syncRepo } = await import("@/lib/scan/repos.server");
+    return syncRepo(supabaseAdmin, data.id);
+  });
