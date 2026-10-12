@@ -316,6 +316,42 @@ export type Database = {
         }
         Relationships: []
       }
+      mangas: {
+        Row: {
+          chapters_total: number | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          mangadex_id: string
+          position: number
+          slug: string
+          title: string
+          volumes: string | null
+        }
+        Insert: {
+          chapters_total?: number | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          mangadex_id: string
+          position?: number
+          slug: string
+          title: string
+          volumes?: string | null
+        }
+        Update: {
+          chapters_total?: number | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          mangadex_id?: string
+          position?: number
+          slug?: string
+          title?: string
+          volumes?: string | null
+        }
+        Relationships: []
+      }
       news_items: {
         Row: {
           anime_id: string | null
