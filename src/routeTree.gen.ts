@@ -20,6 +20,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 import { Route as CatalogoIdRouteImport } from './routes/catalogo.$id'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
+import { Route as ApiPublicMdimgRouteImport } from './routes/api/public/mdimg'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
 
 const IndexRoute = IndexRouteImport.update({
@@ -76,6 +77,11 @@ const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
   path: '/api/public/bootstrap-admin',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicMdimgRoute = ApiPublicMdimgRouteImport.update({
+  id: '/api/public/mdimg',
+  path: '/api/public/mdimg',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   id: '/api/public/sync',
   path: '/api/public/sync',
@@ -93,6 +99,7 @@ export interface FileRoutesByFullPath {
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
 export interface FileRoutesByTo {
@@ -106,6 +113,7 @@ export interface FileRoutesByTo {
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
 export interface FileRoutesById {
@@ -121,6 +129,7 @@ export interface FileRoutesById {
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
 }
 export interface FileRouteTypes {
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/anime/$id'
     | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/anime/$id'
     | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
   id:
     | '__root__'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/anime/$id'
     | '/catalogo/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
   fileRoutesById: FileRoutesById
 }
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   AnimeIdRoute: typeof AnimeIdRoute
   CatalogoIdRoute: typeof CatalogoIdRoute
   ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
+  ApiPublicMdimgRoute: typeof ApiPublicMdimgRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
 }
 
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicBootstrapAdminRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/mdimg': {
+      id: '/api/public/mdimg'
+      path: '/api/public/mdimg'
+      fullPath: '/api/public/mdimg'
+      preLoaderRoute: typeof ApiPublicMdimgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/sync': {
       id: '/api/public/sync'
       path: '/api/public/sync'
@@ -291,6 +311,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnimeIdRoute: AnimeIdRoute,
   CatalogoIdRoute: CatalogoIdRoute,
   ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
+  ApiPublicMdimgRoute: ApiPublicMdimgRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
 }
 export const routeTree = rootRouteImport
