@@ -25,13 +25,13 @@ export function Mangas() {
   });
   const accepted = new Set((list.data ?? []).map((m) => m.mangadex_id));
 
-  const accept = async (m: MangaCard) => {
+  const accept = async (m: MangaCard): Promise<void> => {
     const { error } = await supabase.from("mangas").insert({
       mangadex_id: m.id, title: m.title, slug: slugify(m.title) || m.id, cover_url: m.cover,
       volumes: m.lastVolume, chapters_total: m.lastChapter ? Math.floor(Number(m.lastChapter)) || null : null,
       position: (list.data?.length ?? 0),
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Manga agregado");
     setHidden((h) => [...h, m.id]);
     qc.invalidateQueries({ queryKey: ["mangas"] });

@@ -3,8 +3,8 @@ import { z } from "zod";
 
 const API = "https://api.mangadex.org";
 
-type Rel = { id: string; type: string; attributes?: Record<string, any> };
-type MdManga = { id: string; attributes: Record<string, any>; relationships: Rel[] };
+type Rel = { id: string; type: string; attributes?: any };
+type MdManga = { id: string; attributes: any; relationships: Rel[] };
 
 export type MangaCard = { id: string; title: string; cover: string | null; year: number | null; status: string | null; lastVolume: string | null; lastChapter: string | null; description: string | null };
 export type ChapterItem = { id: string; chapter: string | null; volume: string | null; title: string | null; pages: number; lang: string; group: string | null; publishAt: string | null };
@@ -25,11 +25,11 @@ async function md<T>(path: string): Promise<T> {
   throw new Error("MangaDex no disponible");
 }
 
-const pick = (o: Record<string, string> | undefined) => (o ? o.es ?? o["es-la"] ?? o["es-419"] ?? o.en ?? o["ja-ro"] ?? Object.values(o)[0] ?? null : null);
+const pick = (o: any) => (o ? o.es ?? o["es-la"] ?? o["es-419"] ?? o.en ?? o["ja-ro"] ?? Object.values(o)[0] ?? null : null);
 
 function toCard(m: MdManga): MangaCard {
   const a = m.attributes;
-  const alt = (a.altTitles as Record<string, string>[] | undefined)?.find((t) => t.es || t["es-la"]);
+  const alt = (a.altTitles as any[] | undefined)?.find((t: any) => t.es || t["es-la"]);
   const cov = m.relationships.find((r) => r.type === "cover_art")?.attributes?.fileName;
   return {
     id: m.id,
