@@ -19,8 +19,11 @@ import { Route as VideosRouteImport } from './routes/videos'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AnimeIdRouteImport } from './routes/anime.$id'
 import { Route as CatalogoIdRouteImport } from './routes/catalogo.$id'
+import { Route as MangaIdRouteImport } from './routes/manga.$id'
 import { Route as ApiPublicBootstrapAdminRouteImport } from './routes/api/public/bootstrap-admin'
+import { Route as ApiPublicMdimgRouteImport } from './routes/api/public/mdimg'
 import { Route as ApiPublicSyncRouteImport } from './routes/api/public/sync'
+import { Route as MangaIdChapterRouteImport } from './routes/manga.$id.$chapter'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,15 +74,30 @@ const CatalogoIdRoute = CatalogoIdRouteImport.update({
   path: '/catalogo/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MangaIdRoute = MangaIdRouteImport.update({
+  id: '/manga/$id',
+  path: '/manga/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicBootstrapAdminRoute = ApiPublicBootstrapAdminRouteImport.update({
   id: '/api/public/bootstrap-admin',
   path: '/api/public/bootstrap-admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicMdimgRoute = ApiPublicMdimgRouteImport.update({
+  id: '/api/public/mdimg',
+  path: '/api/public/mdimg',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSyncRoute = ApiPublicSyncRouteImport.update({
   id: '/api/public/sync',
   path: '/api/public/sync',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MangaIdChapterRoute = MangaIdChapterRouteImport.update({
+  id: '/$chapter',
+  path: '/$chapter',
+  getParentRoute: () => MangaIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -92,8 +110,11 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
+  '/manga/$id': typeof MangaIdRouteWithChildren
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/manga/$id/$chapter': typeof MangaIdChapterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -105,8 +126,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
+  '/manga/$id': typeof MangaIdRouteWithChildren
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/manga/$id/$chapter': typeof MangaIdChapterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -120,8 +144,11 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/anime/$id': typeof AnimeIdRoute
   '/catalogo/$id': typeof CatalogoIdRoute
+  '/manga/$id': typeof MangaIdRouteWithChildren
   '/api/public/bootstrap-admin': typeof ApiPublicBootstrapAdminRoute
+  '/api/public/mdimg': typeof ApiPublicMdimgRoute
   '/api/public/sync': typeof ApiPublicSyncRoute
+  '/manga/$id/$chapter': typeof MangaIdChapterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -135,8 +162,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/anime/$id'
     | '/catalogo/$id'
+    | '/manga/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
+    | '/manga/$id/$chapter'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -148,8 +178,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/anime/$id'
     | '/catalogo/$id'
+    | '/manga/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
+    | '/manga/$id/$chapter'
   id:
     | '__root__'
     | '/'
@@ -162,8 +195,11 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/anime/$id'
     | '/catalogo/$id'
+    | '/manga/$id'
     | '/api/public/bootstrap-admin'
+    | '/api/public/mdimg'
     | '/api/public/sync'
+    | '/manga/$id/$chapter'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -176,7 +212,9 @@ export interface RootRouteChildren {
   VideosRoute: typeof VideosRoute
   AnimeIdRoute: typeof AnimeIdRoute
   CatalogoIdRoute: typeof CatalogoIdRoute
+  MangaIdRoute: typeof MangaIdRouteWithChildren
   ApiPublicBootstrapAdminRoute: typeof ApiPublicBootstrapAdminRoute
+  ApiPublicMdimgRoute: typeof ApiPublicMdimgRoute
   ApiPublicSyncRoute: typeof ApiPublicSyncRoute
 }
 
@@ -252,11 +290,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CatalogoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/manga/$id': {
+      id: '/manga/$id'
+      path: '/manga/$id'
+      fullPath: '/manga/$id'
+      preLoaderRoute: typeof MangaIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/bootstrap-admin': {
       id: '/api/public/bootstrap-admin'
       path: '/api/public/bootstrap-admin'
       fullPath: '/api/public/bootstrap-admin'
       preLoaderRoute: typeof ApiPublicBootstrapAdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/mdimg': {
+      id: '/api/public/mdimg'
+      path: '/api/public/mdimg'
+      fullPath: '/api/public/mdimg'
+      preLoaderRoute: typeof ApiPublicMdimgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/sync': {
@@ -265,6 +317,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/sync'
       preLoaderRoute: typeof ApiPublicSyncRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/manga/$id/$chapter': {
+      id: '/manga/$id/$chapter'
+      path: '/$chapter'
+      fullPath: '/manga/$id/$chapter'
+      preLoaderRoute: typeof MangaIdChapterRouteImport
+      parentRoute: typeof MangaIdRoute
     }
   }
 }
@@ -280,6 +339,17 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface MangaIdRouteChildren {
+  MangaIdChapterRoute: typeof MangaIdChapterRoute
+}
+
+const MangaIdRouteChildren: MangaIdRouteChildren = {
+  MangaIdChapterRoute: MangaIdChapterRoute,
+}
+
+const MangaIdRouteWithChildren =
+  MangaIdRoute._addFileChildren(MangaIdRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -290,7 +360,9 @@ const rootRouteChildren: RootRouteChildren = {
   VideosRoute: VideosRoute,
   AnimeIdRoute: AnimeIdRoute,
   CatalogoIdRoute: CatalogoIdRoute,
+  MangaIdRoute: MangaIdRouteWithChildren,
   ApiPublicBootstrapAdminRoute: ApiPublicBootstrapAdminRoute,
+  ApiPublicMdimgRoute: ApiPublicMdimgRoute,
   ApiPublicSyncRoute: ApiPublicSyncRoute,
 }
 export const routeTree = rootRouteImport

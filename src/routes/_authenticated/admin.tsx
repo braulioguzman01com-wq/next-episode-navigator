@@ -4,15 +4,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
-import { AlertTriangle, BarChart3, Database, Film, KeyRound, ListVideo, LogOut, Puzzle, Menu, RefreshCw, Rss, X } from "lucide-react";
+import { AlertTriangle, BarChart3, BookOpen, Database, Film, KeyRound, ListVideo, LogOut, Puzzle, Menu, RefreshCw, Rss, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { syncNow, testSourceUrl } from "@/lib/admin.functions";
 import { Sitios } from "@/components/app/admin-sites";
 import { Repos } from "@/components/app/admin-repos";
+import { Mangas } from "@/components/app/admin-mangas";
 import { cn } from "@/lib/utils";
 
 const SECTIONS = [
   { id: "resumen", label: "Resumen", icon: BarChart3 },
+  { id: "mangas", label: "Mangas", icon: BookOpen },
   { id: "animes", label: "Animes", icon: Film },
   { id: "episodios", label: "Episodios", icon: ListVideo },
   { id: "fuentes", label: "Fuentes", icon: Rss },
@@ -25,7 +27,7 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number]["id"];
 
 export const Route = createFileRoute("/_authenticated/admin")({
-  validateSearch: z.object({ s: z.enum(["resumen", "animes", "episodios", "fuentes", "sitios", "repos", "sync", "errores", "cuenta"]).optional() }),
+  validateSearch: z.object({ s: z.enum(["resumen", "mangas", "animes", "episodios", "fuentes", "sitios", "repos", "sync", "errores", "cuenta"]).optional() }),
   head: () => ({
     meta: [
       { title: "Administración — Estrenos" },
@@ -108,6 +110,7 @@ function AdminPage() {
         {s === "fuentes" && <Fuentes />}
         {s === "sitios" && <Sitios />}
         {s === "repos" && <Repos />}
+        {s === "mangas" && <Mangas />}
         {s === "sync" && <Sync />}
         {s === "errores" && <Errores />}
         {s === "cuenta" && <Cuenta email={role.data.email} />}
